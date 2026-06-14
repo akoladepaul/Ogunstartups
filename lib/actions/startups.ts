@@ -137,6 +137,15 @@ export async function updateStartup(id: string, formData: FormData) {
   return { success: true };
 }
 
+export async function getStartupById(id: string) {
+  const session = await auth();
+  if (!session?.user) return null;
+  return prisma.startup.findFirst({
+    where: { id, founderId: session.user.id },
+    include: { products: true },
+  });
+}
+
 export async function getMyStartup() {
   const session = await auth();
   if (!session?.user) return null;

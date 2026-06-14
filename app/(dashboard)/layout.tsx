@@ -4,13 +4,14 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/lib/actions/auth";
 import {
-  Leaf, LayoutDashboard, Building2, Package, Settings, LogOut,
+  Leaf, LayoutDashboard, Building2, Package, Settings, LogOut, Network,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { href: "/dashboard/startup", icon: Building2, label: "My Startup" },
   { href: "/dashboard/products", icon: Package, label: "Products" },
+  { href: "/dashboard/organization/new", icon: Network, label: "Organization" },
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
