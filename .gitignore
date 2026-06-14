@@ -33,6 +33,9 @@ yarn-error.log*
 /public/uploads/*
 !/public/uploads/.gitkeep
 
+# Server-specific setup scripts (contain credentials)
+setup-vps.sh
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
