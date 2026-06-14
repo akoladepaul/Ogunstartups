@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { MapPin, Globe, BadgeCheck } from "lucide-react";
@@ -34,13 +34,10 @@ const orgTypeColors: Record<string, string> = {
 };
 
 export default async function OrganizationsPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: orgs } = await supabase
-    .from("organizations")
-    .select("*")
-    .eq("status", "approved")
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false });
+  const orgs = await prisma.organization.findMany({
+    where: { status: "approved" },
+    orderBy: [{ createdAt: "desc" }],
+  });
 
   return (
     <div className="pt-16 min-h-screen bg-neutral-50">
@@ -55,7 +52,7 @@ export default async function OrganizationsPage() {
       </div>
 
       <div className="section-container py-10">
-        {!orgs || orgs.length === 0 ? (
+        {orgs.length === 0 ? (
           <div className="text-center py-20 text-neutral-500">
             No organizations listed yet.
           </div>
@@ -65,8 +62,8 @@ export default async function OrganizationsPage() {
               <Link key={org.id} href={`/organizations/${org.slug}`}>
                 <div className="group h-full bg-white rounded-2xl border border-neutral-100 p-6 hover:shadow-md hover:border-brand-green-100 transition-all">
                   <div className="flex items-start gap-4 mb-4">
-                    {org.logo_url ? (
-                      <img src={org.logo_url} alt={org.name}
+                    {org.logoUrl ? (
+                      <img src={org.logoUrl} alt={org.name}
                         className="h-12 w-12 rounded-xl object-cover border border-neutral-100 shrink-0" />
                     ) : (
                       <div className="h-12 w-12 rounded-xl bg-brand-green-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
@@ -78,7 +75,7 @@ export default async function OrganizationsPage() {
                         <h3 className="font-semibold text-neutral-900 text-sm truncate group-hover:text-brand-green-700">
                           {org.name}
                         </h3>
-                        {org.status === "approved" && org.is_featured && (
+                        {org.status === "approved" && (
                           <BadgeCheck className="h-3.5 w-3.5 text-brand-green-600 shrink-0" />
                         )}
                       </div>
@@ -96,14 +93,14 @@ export default async function OrganizationsPage() {
                   </p>
 
                   <div className="flex items-center justify-between">
-                    {org.org_type && (
+                    {org.orgType && (
                       <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                        orgTypeColors[org.org_type] ?? "bg-neutral-100 text-neutral-700"
+                        orgTypeColors[org.orgType] ?? "bg-neutral-100 text-neutral-700"
                       }`}>
-                        {ORG_TYPE_LABELS[org.org_type] ?? org.org_type}
+                        {ORG_TYPE_LABELS[org.orgType] ?? org.orgType}
                       </span>
                     )}
-                    {org.website_url && (
+                    {org.websiteUrl && (
                       <Globe className="h-4 w-4 text-neutral-300" />
                     )}
                   </div>

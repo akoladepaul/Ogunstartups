@@ -37,9 +37,9 @@ export default function FeaturedStartups({ startups }: FeaturedStartupsProps) {
               <div className="group bg-white border border-neutral-100 rounded-2xl p-6 hover:shadow-md hover:border-brand-green-100 transition-all duration-200">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  {startup.logo_url ? (
+                  {startup.logoUrl ? (
                     <img
-                      src={startup.logo_url}
+                      src={startup.logoUrl}
                       alt={startup.name}
                       className="h-12 w-12 rounded-xl object-cover border border-neutral-100"
                     />
@@ -81,7 +81,7 @@ export default function FeaturedStartups({ startups }: FeaturedStartupsProps) {
                       {startup.stage}
                     </Badge>
                   )}
-                  {startup.is_hiring && (
+                  {startup.isHiring && (
                     <Badge variant="hiring">Hiring</Badge>
                   )}
                 </div>

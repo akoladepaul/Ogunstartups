@@ -1,18 +1,17 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
 
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await auth();
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar user={user} />
+      <Navbar user={session?.user ?? null} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

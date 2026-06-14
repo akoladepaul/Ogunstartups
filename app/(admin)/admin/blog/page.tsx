@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getAllPostsAdmin } from "@/lib/actions/posts";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Plus, Edit, Eye } from "lucide-react";
@@ -53,9 +52,9 @@ export default async function AdminBlogPage() {
                       {post.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-neutral-500">{post.view_count}</td>
+                  <td className="px-4 py-3 text-neutral-500">{post.viewCount}</td>
                   <td className="px-4 py-3 text-neutral-500 text-xs">
-                    {formatDate(post.created_at)}
+                    {formatDate(post.createdAt.toISOString())}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">

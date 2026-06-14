@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
-      images: post.cover_image_url ? [post.cover_image_url] : [],
+      images: post.coverImageUrl ? [post.coverImageUrl] : [],
       type: "article",
     },
   };
@@ -45,70 +45,65 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   incrementPostViews(post.id).catch(() => {});
 
+  const tags = Array.isArray(post.tags) ? post.tags : [];
+
   return (
     <div className="pt-16 min-h-screen bg-white">
-      {/* Back */}
       <div className="section-container pt-6">
         <Link href="/blog" className="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-brand-green-600 mb-6">
           <ArrowLeft className="h-4 w-4" /> Back to Blog
         </Link>
       </div>
 
-      {/* Cover */}
-      {post.cover_image_url && (
+      {post.coverImageUrl && (
         <div className="section-container mb-8">
           <div className="rounded-2xl overflow-hidden h-72 lg:h-96">
-            <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover" />
+            <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
           </div>
         </div>
       )}
 
       <div className="section-container">
         <div className="grid lg:grid-cols-3 gap-12 pb-16">
-          {/* Article */}
           <article className="lg:col-span-2">
-            {/* Category */}
             <div className="mb-4">
               <span className="text-xs font-semibold text-brand-green-600 uppercase tracking-widest">
                 {categoryLabels[post.category] ?? post.category}
               </span>
             </div>
 
-            {/* Title */}
             <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 leading-tight mb-6">
               {post.title}
             </h1>
 
-            {/* Meta */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-500 mb-8 pb-8 border-b border-neutral-100">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-brand-green-100 flex items-center justify-center text-brand-green-700 text-xs font-bold">
-                  {getInitials(post.profiles?.full_name ?? "A")}
+                  {getInitials(post.author?.name ?? "A")}
                 </div>
                 <span className="font-medium text-neutral-700">
-                  {post.profiles?.full_name ?? "OgunStartups Team"}
+                  {post.author?.name ?? "OgunStartups Team"}
                 </span>
               </div>
-              {post.published_at && (
+              {post.publishedAt && (
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5" />
-                  {formatDate(post.published_at)}
+                  {formatDate(new Date(post.publishedAt).toISOString())}
                 </div>
               )}
-              {post.read_time_mins && (
+              {post.readTimeMins && (
                 <div className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
-                  {post.read_time_mins} min read
+                  {post.readTimeMins} min read
                 </div>
               )}
               <div className="flex items-center gap-1">
                 <Eye className="h-3.5 w-3.5" />
-                {post.view_count} views
+                {post.viewCount} views
               </div>
             </div>
 
-            {/* Content */}
-            <div className="prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-neutral-900 prose-p:text-neutral-600 prose-p:leading-relaxed prose-a:text-brand-green-600 prose-strong:text-neutral-900">
+            <div className="prose prose-neutral max-w-none">
               {post.content.split("\n\n").map((paragraph, i) => (
                 <p key={i} className="text-neutral-600 leading-relaxed mb-4">
                   {paragraph}
@@ -116,12 +111,11 @@ export default async function BlogPostPage({ params }: PageProps) {
               ))}
             </div>
 
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
+            {tags.length > 0 && (
               <div className="mt-8 pt-6 border-t border-neutral-100">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Tag className="h-4 w-4 text-neutral-400" />
-                  {post.tags.map((tag) => (
+                  {tags.map((tag) => (
                     <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full font-medium">
                       #{tag}
                     </span>
@@ -130,21 +124,19 @@ export default async function BlogPostPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Related startup */}
-            {post.startups && (
+            {post.startup && (
               <div className="mt-8 p-5 bg-brand-green-50 rounded-2xl border border-brand-green-100">
                 <p className="text-sm text-brand-green-700 mb-2">Featured startup in this story:</p>
                 <Link
-                  href={`/startups/${post.startups.slug}`}
+                  href={`/startups/${post.startup.slug}`}
                   className="font-semibold text-brand-green-800 hover:underline"
                 >
-                  {post.startups.name} →
+                  {post.startup.name} →
                 </Link>
               </div>
             )}
           </article>
 
-          {/* Sidebar */}
           <aside className="space-y-6">
             <div className="bg-neutral-50 rounded-2xl p-5">
               <h3 className="font-semibold text-neutral-900 mb-4 text-sm">Latest Posts</h3>
@@ -159,7 +151,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                           {p.title}
                         </div>
                         <div className="text-xs text-neutral-400">
-                          {p.published_at ? formatDate(p.published_at) : ""}
+                          {p.publishedAt ? formatDate(new Date(p.publishedAt).toISOString()) : ""}
                         </div>
                       </div>
                     </Link>

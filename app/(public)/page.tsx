@@ -6,6 +6,7 @@ import LGAExplorer from "@/components/landing/LGAExplorer";
 import HowItWorks from "@/components/landing/HowItWorks";
 import CTASection from "@/components/landing/CTASection";
 import { getFeaturedStartups, getStats } from "@/lib/actions/startups";
+import type { Startup } from "@/types";
 
 export const revalidate = 3600;
 
@@ -19,7 +20,7 @@ export default async function HomePage() {
     <>
       <HeroSection />
       <StatsSection stats={stats} />
-      <FeaturedStartups startups={featured} />
+      <FeaturedStartups startups={featured as unknown as Startup[]} />
       <SectorsGrid />
       <LGAExplorer />
       <HowItWorks />

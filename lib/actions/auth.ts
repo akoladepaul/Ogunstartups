@@ -1,49 +1,40 @@
 "use server";
 
+import { signIn, signOut } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import bcrypt from "bcryptjs";
 
 export async function signInWithEmail(email: string, password: string) {
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: error.message };
-  redirect("/dashboard");
-}
-
-export async function signInWithMagicLink(email: string) {
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
-  });
-  if (error) return { error: error.message };
-  return { success: true };
+  try {
+    await signIn("credentials", { email, password, redirectTo: "/dashboard" });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Invalid email or password. Please try again." };
+    }
+    throw error;
+  }
 }
 
 export async function signUp(email: string, password: string, fullName: string) {
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) return { error: "An account with this email already exists." };
+
+  const hashed = await bcrypt.hash(password, 12);
+  await prisma.user.create({
+    data: { email, name: fullName, password: hashed, role: "founder" },
   });
-  if (error) return { error: error.message };
-  return { success: true, message: "Check your email to confirm your account." };
+
+  return { success: true, message: "Account created! Please sign in." };
 }
 
-export async function signOut() {
-  const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
-  redirect("/");
+export async function signOutAction() {
+  await signOut({ redirectTo: "/" });
 }
 
 export async function getSession() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  const { auth } = await import("@/lib/auth");
+  const session = await auth();
+  return session?.user ?? null;
 }

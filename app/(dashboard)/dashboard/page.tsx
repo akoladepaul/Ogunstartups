@@ -1,18 +1,17 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { getMyStartup } from "@/lib/actions/startups";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, Edit, AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", user!.id)
-    .single();
+  const session = await auth();
+  const user = await prisma.user.findUnique({
+    where: { id: session!.user.id },
+    select: { name: true },
+  });
 
   const startup = await getMyStartup();
 
@@ -51,13 +50,12 @@ export default async function DashboardPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-neutral-900">
-          Welcome back, {profile?.full_name?.split(" ")[0] ?? "Founder"} 👋
+          Welcome back, {user?.name?.split(" ")[0] ?? "Founder"} 👋
         </h1>
         <p className="text-neutral-500 mt-1">Manage your startup listing from here.</p>
       </div>
 
       {!startup ? (
-        /* No startup yet */
         <div className="max-w-lg">
           <div className="bg-white rounded-2xl border border-neutral-100 p-8 text-center">
             <div className="h-16 w-16 rounded-2xl bg-brand-green-100 flex items-center justify-center mx-auto mb-4">
@@ -77,9 +75,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       ) : (
-        /* Has startup */
         <div className="space-y-6 max-w-2xl">
-          {/* Status banner */}
           {(() => {
             const config = statusConfig[startup.status as keyof typeof statusConfig];
             const Icon = config.icon;
@@ -96,7 +92,6 @@ export default async function DashboardPage() {
             );
           })()}
 
-          {/* Startup card */}
           <div className="bg-white rounded-2xl border border-neutral-100 p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -108,12 +103,12 @@ export default async function DashboardPage() {
 
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-neutral-50 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-neutral-900">{startup.view_count}</div>
+                <div className="text-2xl font-bold text-neutral-900">{startup.viewCount}</div>
                 <div className="text-xs text-neutral-500 mt-0.5">Profile Views</div>
               </div>
               <div className="bg-neutral-50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-bold text-neutral-900">
-                  {startup.startup_products?.length ?? 0}
+                  {startup.products?.length ?? 0}
                 </div>
                 <div className="text-xs text-neutral-500 mt-0.5">Products Listed</div>
               </div>

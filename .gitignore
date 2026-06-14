@@ -29,6 +29,10 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Uploads (user-generated content — persisted on VPS, not in git)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

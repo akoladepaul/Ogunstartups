@@ -2,30 +2,30 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { adminClient } from "@/lib/supabase/admin";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 
 export interface Post {
   id: string;
-  author_id: string;
+  authorId: string;
   title: string;
   slug: string;
   excerpt: string | null;
   content: string;
-  cover_image_url: string | null;
+  coverImageUrl: string | null;
   category: string;
   tags: string[];
   status: "draft" | "published" | "archived";
   featured: boolean;
-  startup_id: string | null;
-  published_at: string | null;
-  view_count: number;
-  read_time_mins: number | null;
-  created_at: string;
-  updated_at: string;
-  profiles?: { full_name: string | null; avatar_url: string | null };
-  startups?: { name: string; slug: string } | null;
+  startupId: string | null;
+  publishedAt: Date | null;
+  viewCount: number;
+  readTimeMins: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: { name: string | null; image: string | null };
+  startup?: { name: string; slug: string } | null;
 }
 
 export async function getPosts(options: {
@@ -35,67 +35,79 @@ export async function getPosts(options: {
   limit?: number;
   page?: number;
 } = {}) {
-  const supabase = await createServerSupabaseClient();
   const { category, search, featured, limit = 12, page = 1 } = options;
-  const offset = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-  let query = supabase
-    .from("posts")
-    .select("*, profiles(full_name, avatar_url)", { count: "exact" })
-    .eq("status", "published")
-    .order("published_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+  const where: any = { status: "published" };
+  if (category) where.category = category;
+  if (featured) where.featured = true;
+  if (search) {
+    where.OR = [
+      { title: { contains: search } },
+      { excerpt: { contains: search } },
+      { content: { contains: search } },
+    ];
+  }
 
-  if (category) query = query.eq("category", category);
-  if (featured) query = query.eq("featured", true);
-  if (search) query = query.textSearch("search_vector", search, { type: "websearch" });
+  const [data, count] = await Promise.all([
+    prisma.post.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { publishedAt: "desc" },
+      include: { author: { select: { name: true, image: true } } },
+    }),
+    prisma.post.count({ where }),
+  ]);
 
-  const { data, count, error } = await query;
-  if (error) return { data: [], count: 0 };
-
-  return {
-    data: (data ?? []) as Post[],
-    count: count ?? 0,
-    totalPages: Math.ceil((count ?? 0) / limit),
-  };
+  return { data: data as unknown as Post[], count, totalPages: Math.ceil(count / limit) };
 }
 
 export async function getFeaturedPosts(limit = 3) {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from("posts")
-    .select("*, profiles(full_name, avatar_url)")
-    .eq("status", "published")
-    .eq("featured", true)
-    .order("published_at", { ascending: false })
-    .limit(limit);
-  return (data ?? []) as Post[];
+  const data = await prisma.post.findMany({
+    where: { status: "published", featured: true },
+    take: limit,
+    orderBy: { publishedAt: "desc" },
+    include: { author: { select: { name: true, image: true } } },
+  });
+  return data as unknown as Post[];
 }
 
 export async function getPostBySlug(slug: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from("posts")
-    .select("*, profiles(full_name, avatar_url), startups(name, slug)")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .single();
-  return data as Post | null;
+  const data = await prisma.post.findFirst({
+    where: { slug, status: "published" },
+    include: {
+      author: { select: { name: true, image: true } },
+      startup: { select: { name: true, slug: true } },
+    },
+  });
+  return data as unknown as Post | null;
 }
 
 export async function incrementPostViews(postId: string) {
-  await adminClient.rpc("increment_post_views", { post_id: postId });
+  await prisma.post.update({
+    where: { id: postId },
+    data: { viewCount: { increment: 1 } },
+  });
 }
 
 export async function getLatestPosts(limit = 5) {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from("posts")
-    .select("id, title, slug, excerpt, cover_image_url, category, published_at, profiles(full_name)")
-    .eq("status", "published")
-    .order("published_at", { ascending: false })
-    .limit(limit);
-  return (data ?? []) as unknown as Post[];
+  const data = await prisma.post.findMany({
+    where: { status: "published" },
+    take: limit,
+    orderBy: { publishedAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImageUrl: true,
+      category: true,
+      publishedAt: true,
+      author: { select: { name: true } },
+    },
+  });
+  return data as unknown as Post[];
 }
 
 // Admin actions
@@ -103,68 +115,73 @@ export async function createPost(data: {
   title: string;
   excerpt?: string;
   content: string;
-  cover_image_url?: string;
+  coverImageUrl?: string;
   category: string;
   tags?: string[];
-  startup_id?: string;
+  startupId?: string;
   status?: "draft" | "published";
   featured?: boolean;
 }) {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") return { error: "Unauthorized" };
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+  if ((session.user as any).role !== "admin") return { error: "Unauthorized" };
 
   const slug = slugify(data.title);
-  const { data: existing } = await adminClient
-    .from("posts").select("id").eq("slug", slug).single();
+  const existing = await prisma.post.findUnique({ where: { slug } });
   const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
 
   const wordCount = data.content.split(/\s+/).length;
   const readTimeMins = Math.max(1, Math.ceil(wordCount / 200));
 
-  const { error } = await adminClient.from("posts").insert({
-    ...data,
-    slug: finalSlug,
-    author_id: user.id,
-    read_time_mins: readTimeMins,
-    published_at: data.status === "published" ? new Date().toISOString() : null,
+  await prisma.post.create({
+    data: {
+      authorId: session.user.id,
+      title: data.title,
+      slug: finalSlug,
+      excerpt: data.excerpt ?? null,
+      content: data.content,
+      coverImageUrl: data.coverImageUrl ?? null,
+      category: data.category,
+      tags: data.tags ?? [],
+      status: (data.status ?? "draft") as any,
+      featured: data.featured ?? false,
+      startupId: data.startupId ?? null,
+      readTimeMins,
+      publishedAt: data.status === "published" ? new Date() : null,
+    },
   });
-
-  if (error) return { error: error.message };
 
   revalidatePath("/blog");
   redirect("/admin/blog");
 }
 
-export async function updatePost(id: string, data: Partial<{
-  title: string;
-  excerpt: string;
-  content: string;
-  cover_image_url: string;
-  category: string;
-  tags: string[];
-  status: "draft" | "published" | "archived";
-  featured: boolean;
-  startup_id: string;
-}>) {
+export async function updatePost(
+  id: string,
+  data: Partial<{
+    title: string;
+    excerpt: string;
+    content: string;
+    coverImageUrl: string;
+    category: string;
+    tags: string[];
+    status: "draft" | "published" | "archived";
+    featured: boolean;
+    startupId: string;
+  }>
+) {
   const wordCount = data.content?.split(/\s+/).length ?? 0;
   const readTimeMins = wordCount ? Math.max(1, Math.ceil(wordCount / 200)) : undefined;
 
-  const { error } = await adminClient
-    .from("posts")
-    .update({
+  await prisma.post.update({
+    where: { id },
+    data: {
       ...data,
-      read_time_mins: readTimeMins,
-      published_at: data.status === "published" ? new Date().toISOString() : undefined,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) return { error: error.message };
+      tags: data.tags ?? undefined,
+      status: data.status as any,
+      readTimeMins,
+      publishedAt: data.status === "published" ? new Date() : undefined,
+    },
+  });
 
   revalidatePath("/blog");
   revalidatePath(`/blog/${id}`);
@@ -172,9 +189,9 @@ export async function updatePost(id: string, data: Partial<{
 }
 
 export async function getAllPostsAdmin() {
-  const { data } = await adminClient
-    .from("posts")
-    .select("*, profiles(full_name)")
-    .order("created_at", { ascending: false });
-  return (data ?? []) as Post[];
+  const data = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { author: { select: { name: true } } },
+  });
+  return data as unknown as Post[];
 }

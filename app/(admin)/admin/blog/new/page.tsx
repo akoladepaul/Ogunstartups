@@ -29,7 +29,7 @@ export default function NewPostPage() {
     title: "",
     excerpt: "",
     content: "",
-    cover_image_url: "",
+    coverImageUrl: "",
     category: "news",
     tags: "",
     status: "draft" as "draft" | "published",
@@ -110,9 +110,9 @@ export default function NewPostPage() {
         </div>
 
         <div>
-          <Label htmlFor="cover_image_url">Cover Image URL</Label>
-          <Input id="cover_image_url" type="url" value={form.cover_image_url}
-            onChange={e => update("cover_image_url", e.target.value)}
+          <Label htmlFor="coverImageUrl">Cover Image URL</Label>
+          <Input id="coverImageUrl" type="url" value={form.coverImageUrl}
+            onChange={e => update("coverImageUrl", e.target.value)}
             placeholder="https://..." className="mt-1.5" />
         </div>
 

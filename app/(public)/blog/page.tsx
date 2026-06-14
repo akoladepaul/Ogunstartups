@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getPosts } from "@/lib/actions/posts";
-import { Badge } from "@/components/ui/badge";
 import { formatDate, getInitials } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
@@ -46,7 +45,6 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
   return (
     <div className="pt-16 min-h-screen bg-neutral-50">
-      {/* Header */}
       <div className="bg-brand-green-900 text-white py-16">
         <div className="section-container text-center">
           <div className="inline-flex items-center gap-2 bg-brand-green-800 rounded-full px-4 py-1.5 text-sm mb-4">
@@ -60,7 +58,6 @@ export default async function BlogPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {/* Category filter */}
       <div className="bg-white border-b border-neutral-100 sticky top-16 z-10">
         <div className="section-container py-3 flex gap-2 overflow-x-auto">
           {CATEGORIES.map((cat) => (
@@ -87,15 +84,14 @@ export default async function BlogPage({ searchParams }: PageProps) {
           </div>
         ) : (
           <>
-            {/* Featured post (first one) */}
             {page === 1 && result.data[0] && (
               <Link href={`/blog/${result.data[0].slug}`} className="block mb-12">
                 <article className="bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-lg transition-shadow group">
                   <div className="grid md:grid-cols-2">
                     <div className="h-64 md:h-auto bg-gradient-to-br from-brand-green-100 to-brand-green-50">
-                      {result.data[0].cover_image_url && (
+                      {result.data[0].coverImageUrl && (
                         <img
-                          src={result.data[0].cover_image_url}
+                          src={result.data[0].coverImageUrl}
                           alt={result.data[0].title}
                           className="w-full h-full object-cover"
                         />
@@ -123,12 +119,12 @@ export default async function BlogPage({ searchParams }: PageProps) {
                       <div className="flex items-center gap-3 text-xs text-neutral-400">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {result.data[0].published_at ? formatDate(result.data[0].published_at) : ""}
+                          {result.data[0].publishedAt ? formatDate(new Date(result.data[0].publishedAt).toISOString()) : ""}
                         </div>
-                        {result.data[0].read_time_mins && (
+                        {result.data[0].readTimeMins && (
                           <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {result.data[0].read_time_mins} min read
+                            {result.data[0].readTimeMins} min read
                           </div>
                         )}
                         <div className="flex items-center gap-1 ml-auto text-brand-green-600 font-medium">
@@ -141,15 +137,14 @@ export default async function BlogPage({ searchParams }: PageProps) {
               </Link>
             )}
 
-            {/* Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {result.data.slice(page === 1 ? 1 : 0).map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`}>
                   <article className="group h-full bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-md hover:border-brand-green-100 transition-all">
                     <div className="h-44 bg-gradient-to-br from-neutral-100 to-neutral-50">
-                      {post.cover_image_url && (
+                      {post.coverImageUrl && (
                         <img
-                          src={post.cover_image_url}
+                          src={post.coverImageUrl}
                           alt={post.title}
                           className="w-full h-full object-cover"
                         />
@@ -167,11 +162,11 @@ export default async function BlogPage({ searchParams }: PageProps) {
                       <p className="text-xs text-neutral-500 line-clamp-2 mb-3">{post.excerpt}</p>
                       <div className="flex items-center gap-2 text-xs text-neutral-400">
                         <div className="h-5 w-5 rounded-full bg-brand-green-100 flex items-center justify-center text-brand-green-700 font-bold text-xs">
-                          {getInitials(post.profiles?.full_name ?? "A")}
+                          {getInitials(post.author?.name ?? "A")}
                         </div>
-                        <span>{post.profiles?.full_name}</span>
+                        <span>{post.author?.name}</span>
                         <span>·</span>
-                        <span>{post.read_time_mins ?? 1} min read</span>
+                        <span>{post.readTimeMins ?? 1} min read</span>
                       </div>
                     </div>
                   </article>
@@ -179,7 +174,6 @@ export default async function BlogPage({ searchParams }: PageProps) {
               ))}
             </div>
 
-            {/* Pagination */}
             {(result.totalPages ?? 1) > 1 && (
               <div className="flex justify-center gap-2 mt-10">
                 {page > 1 && (

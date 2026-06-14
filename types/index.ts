@@ -17,69 +17,70 @@ export type OrgType =
 export interface Profile {
   id: string;
   email: string;
-  full_name: string | null;
-  avatar_url: string | null;
+  name: string | null;
+  image: string | null;
   role: UserRole;
-  created_at: string;
-  updated_at: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Startup {
   id: string;
-  founder_id: string;
+  founderId: string;
   name: string;
   slug: string;
   tagline: string | null;
   description: string | null;
-  logo_url: string | null;
-  cover_url: string | null;
-  website_url: string | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  websiteUrl: string | null;
   category: string | null;
   stage: StartupStage | null;
-  founded_year: number | null;
+  foundedYear: number | null;
   location: string;
   lga: string | null;
-  is_hiring: boolean;
+  isHiring: boolean;
+  isFeatured: boolean;
   status: StartupStatus;
   tags: string[];
-  social_links: Record<string, string>;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
-  profiles?: Profile;
+  socialLinks: Record<string, string>;
+  viewCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  founder?: Profile;
   products?: StartupProduct[];
 }
 
 export interface StartupProduct {
   id: string;
-  startup_id: string;
+  startupId: string;
   name: string;
   description: string | null;
-  image_url: string | null;
+  imageUrl: string | null;
   price: number | null;
   currency: string;
-  created_at: string;
+  createdAt: Date;
 }
 
 export interface Organization {
   id: string;
-  owner_id: string;
+  ownerId: string;
   name: string;
   slug: string;
   tagline: string | null;
   description: string | null;
-  logo_url: string | null;
-  cover_url: string | null;
-  website_url: string | null;
-  org_type: OrgType | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  websiteUrl: string | null;
+  orgType: OrgType | null;
   lga: string | null;
-  founded_year: number | null;
+  foundedYear: number | null;
   status: StartupStatus;
   tags: string[];
-  social_links: Record<string, string>;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
+  socialLinks: Record<string, string>;
+  viewCount: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface FilterOptions {

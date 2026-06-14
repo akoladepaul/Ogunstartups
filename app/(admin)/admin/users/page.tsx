@@ -1,13 +1,11 @@
-import { adminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/prisma";
 import { formatDate, getInitials } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 async function getUsers() {
-  const { data } = await adminClient
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: false });
-  return data ?? [];
+  return prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    select: { id: true, name: true, email: true, image: true, role: true, createdAt: true },
+  });
 }
 
 export default async function AdminUsersPage() {
@@ -42,14 +40,14 @@ export default async function AdminUsersPage() {
                 <tr key={user.id} className="hover:bg-neutral-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {user.avatar_url ? (
-                        <img src={user.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                      {user.image ? (
+                        <img src={user.image} alt="" className="h-8 w-8 rounded-full object-cover" />
                       ) : (
                         <div className="h-8 w-8 rounded-full bg-brand-green-100 flex items-center justify-center text-brand-green-700 text-xs font-bold">
-                          {getInitials(user.full_name ?? "U")}
+                          {getInitials(user.name ?? "U")}
                         </div>
                       )}
-                      <span className="font-medium text-neutral-900">{user.full_name ?? "—"}</span>
+                      <span className="font-medium text-neutral-900">{user.name ?? "—"}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-neutral-600">{user.email}</td>
@@ -58,7 +56,7 @@ export default async function AdminUsersPage() {
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-neutral-500 text-xs">{formatDate(user.created_at)}</td>
+                  <td className="px-4 py-3 text-neutral-500 text-xs">{formatDate(user.createdAt.toISOString())}</td>
                 </tr>
               ))}
             </tbody>

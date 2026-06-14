@@ -21,7 +21,6 @@ export default async function AdminStartupsPage({
         <span className="text-sm text-neutral-500">{startups.length} total</span>
       </div>
 
-      {/* Status tabs */}
       <div className="flex gap-2 mb-6">
         {statusTabs.map((s) => (
           <Link key={s} href={s === "all" ? "/admin/startups" : `/admin/startups?status=${s}`}>
@@ -54,14 +53,14 @@ export default async function AdminStartupsPage({
                 <tr key={startup.id} className="hover:bg-neutral-50">
                   <td className="px-4 py-3">
                     <div className="font-medium text-neutral-900">{startup.name}</div>
-                    <div className="text-xs text-neutral-400">{(startup as any).profiles?.email}</div>
+                    <div className="text-xs text-neutral-400">{(startup as any).founder?.email}</div>
                   </td>
                   <td className="px-4 py-3 capitalize text-neutral-600">{startup.category ?? "—"}</td>
                   <td className="px-4 py-3 text-neutral-600">{startup.lga ?? "—"}</td>
                   <td className="px-4 py-3">
                     <Badge variant={startup.status as any}>{startup.status}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-neutral-500 text-xs">{formatDate(startup.created_at)}</td>
+                  <td className="px-4 py-3 text-neutral-500 text-xs">{formatDate(startup.createdAt.toISOString())}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       {startup.status === "pending" && (
@@ -75,9 +74,9 @@ export default async function AdminStartupsPage({
                         </>
                       )}
                       {startup.status === "approved" && (
-                        <form action={async () => { "use server"; await toggleFeatured(startup.id, !startup.is_featured); }}>
+                        <form action={async () => { "use server"; await toggleFeatured(startup.id, !startup.isFeatured); }}>
                           <Button size="sm" variant="outline" className="h-7 text-xs">
-                            {startup.is_featured ? "Unfeature" : "Feature"}
+                            {startup.isFeatured ? "Unfeature" : "Feature"}
                           </Button>
                         </form>
                       )}

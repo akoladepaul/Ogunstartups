@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { signOut } from "@/lib/actions/auth";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { signOutAction } from "@/lib/actions/auth";
 import {
   Leaf, LayoutDashboard, Building2, Users, BarChart3,
   Clock, LogOut, Newspaper,
@@ -18,17 +19,15 @@ const adminNav = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const session = await auth();
+  if (!session?.user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, role")
-    .eq("id", user.id)
-    .single();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, role: true },
+  });
 
-  if (profile?.role !== "admin") redirect("/");
+  if (user?.role !== "admin") redirect("/");
 
   return (
     <div className="min-h-screen bg-neutral-50 flex">
@@ -57,10 +56,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         <div className="border-t border-brand-green-800 pt-4">
           <div className="px-3 py-2 mb-1">
-            <div className="text-xs font-medium text-white">{profile?.full_name}</div>
+            <div className="text-xs font-medium text-white">{user?.name}</div>
             <div className="text-xs text-brand-green-400">Administrator</div>
           </div>
-          <form action={signOut}>
+          <form action={signOutAction}>
             <button className="flex w-full items-center gap-2 px-3 py-2 rounded-xl text-xs text-brand-green-300 hover:bg-red-900/50 hover:text-red-300 transition-colors">
               <LogOut className="h-3.5 w-3.5" /> Sign Out
             </button>

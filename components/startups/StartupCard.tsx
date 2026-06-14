@@ -12,18 +12,18 @@ export default function StartupCard({ startup }: { startup: Startup }) {
       <article className="group h-full bg-white border border-neutral-100 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-green-100 transition-all duration-200">
         {/* Cover */}
         <div className="h-32 bg-gradient-to-br from-brand-green-100 to-brand-green-50 relative">
-          {startup.cover_url && (
+          {startup.coverUrl && (
             <img
-              src={startup.cover_url}
+              src={startup.coverUrl}
               alt=""
               className="w-full h-full object-cover"
             />
           )}
           {/* Logo */}
           <div className="absolute -bottom-5 left-5">
-            {startup.logo_url ? (
+            {startup.logoUrl ? (
               <img
-                src={startup.logo_url}
+                src={startup.logoUrl}
                 alt={startup.name}
                 className="h-11 w-11 rounded-xl border-2 border-white shadow-sm object-cover"
               />
@@ -69,7 +69,7 @@ export default function StartupCard({ startup }: { startup: Startup }) {
                 {startup.stage}
               </Badge>
             )}
-            {startup.is_hiring && (
+            {startup.isHiring && (
               <Badge variant="hiring" className="text-xs">Hiring</Badge>
             )}
           </div>

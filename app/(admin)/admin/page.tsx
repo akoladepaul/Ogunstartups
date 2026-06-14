@@ -1,30 +1,24 @@
-import { adminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 async function getAdminStats() {
   const [startups, orgs, users, pending] = await Promise.all([
-    adminClient.from("startups").select("id", { count: "exact" }),
-    adminClient.from("organizations").select("id", { count: "exact" }),
-    adminClient.from("profiles").select("id", { count: "exact" }),
-    adminClient.from("startups").select("id", { count: "exact" }).eq("status", "pending"),
+    prisma.startup.count(),
+    prisma.organization.count(),
+    prisma.user.count(),
+    prisma.startup.count({ where: { status: "pending" } }),
   ]);
-  return {
-    startups: startups.count ?? 0,
-    orgs: orgs.count ?? 0,
-    users: users.count ?? 0,
-    pending: pending.count ?? 0,
-  };
+  return { startups, orgs, users, pending };
 }
 
 async function getRecentActivity() {
-  const { data } = await adminClient
-    .from("startups")
-    .select("id, name, status, created_at, category")
-    .order("created_at", { ascending: false })
-    .limit(8);
-  return data ?? [];
+  return prisma.startup.findMany({
+    take: 8,
+    orderBy: { createdAt: "desc" },
+    select: { id: true, name: true, status: true, createdAt: true, category: true },
+  });
 }
 
 export default async function AdminDashboard() {
@@ -41,7 +35,6 @@ export default async function AdminDashboard() {
     <div>
       <h1 className="text-2xl font-bold text-neutral-900 mb-6">Admin Overview</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((card) => (
           <div key={card.label} className={`bg-white rounded-2xl border p-5 ${card.urgent ? "border-yellow-200" : "border-neutral-100"}`}>
@@ -51,7 +44,6 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Pending alert */}
       {stats.pending > 0 && (
         <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 mb-8 flex items-center justify-between">
           <div className="text-sm text-yellow-800">
@@ -63,7 +55,6 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* Recent submissions */}
       <div className="bg-white rounded-2xl border border-neutral-100">
         <div className="px-6 py-4 border-b border-neutral-100">
           <h2 className="font-semibold text-neutral-900">Recent Submissions</h2>
@@ -74,7 +65,7 @@ export default async function AdminDashboard() {
               <div>
                 <div className="text-sm font-medium text-neutral-900">{item.name}</div>
                 <div className="text-xs text-neutral-500 mt-0.5">
-                  {item.category} · {formatDate(item.created_at)}
+                  {item.category} · {formatDate(item.createdAt.toISOString())}
                 </div>
               </div>
               <Badge variant={item.status as any}>{item.status}</Badge>

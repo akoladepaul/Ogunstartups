@@ -13,7 +13,7 @@ const navLinks = [
   { href: "/about", label: "About" },
 ];
 
-export default function Navbar({ user }: { user?: { email?: string } | null }) {
+export default function Navbar({ user }: { user?: { email?: string | null } | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 

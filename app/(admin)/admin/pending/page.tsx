@@ -43,7 +43,7 @@ export default async function AdminPendingPage() {
                     <div><span className="font-medium text-neutral-700">Sector:</span> {startup.category ?? "—"}</div>
                     <div><span className="font-medium text-neutral-700">Stage:</span> {startup.stage ?? "—"}</div>
                     <div><span className="font-medium text-neutral-700">LGA:</span> {startup.lga ?? "—"}</div>
-                    <div><span className="font-medium text-neutral-700">Submitted:</span> {formatDate(startup.created_at)}</div>
+                    <div><span className="font-medium text-neutral-700">Submitted:</span> {formatDate(startup.createdAt.toISOString())}</div>
                   </div>
 
                   {startup.description && (
@@ -52,10 +52,10 @@ export default async function AdminPendingPage() {
                     </p>
                   )}
 
-                  {(startup as any).profiles && (
+                  {(startup as any).founder && (
                     <div className="mt-3 text-xs text-neutral-500">
-                      Submitted by: <span className="font-medium">{(startup as any).profiles.full_name}</span>{" "}
-                      ({(startup as any).profiles.email})
+                      Submitted by: <span className="font-medium">{(startup as any).founder.name}</span>{" "}
+                      ({(startup as any).founder.email})
                     </div>
                   )}
                 </div>
