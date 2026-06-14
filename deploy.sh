@@ -10,10 +10,10 @@ echo "==> Pulling latest code"
 git pull origin main
 
 echo "==> Installing dependencies"
-npm ci --production=false
+npm install --legacy-peer-deps
 
-echo "==> Running database migrations"
-npx prisma migrate deploy
+echo "==> Syncing database schema"
+npx prisma db push
 
 echo "==> Building application"
 npm run build
