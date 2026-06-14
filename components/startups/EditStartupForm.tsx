@@ -17,6 +17,7 @@ import { updateStartup } from "@/lib/actions/startups";
 import { SECTORS } from "@/constants/sectors";
 import { ALL_LGAS } from "@/constants/lgas";
 import { STAGES } from "@/constants/stages";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface Props {
   startup: {
@@ -29,6 +30,7 @@ interface Props {
     lga: string | null;
     foundedYear: number | null;
     websiteUrl: string | null;
+    logoUrl: string | null;
     isHiring: boolean;
     tags: unknown;
     socialLinks: unknown;
@@ -40,6 +42,7 @@ export default function EditStartupForm({ startup }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [logoUrl, setLogoUrl] = useState(startup.logoUrl ?? "");
 
   const socialLinks = (startup.socialLinks ?? {}) as Record<string, string>;
   const tags = Array.isArray(startup.tags) ? (startup.tags as string[]) : [];
@@ -80,6 +83,7 @@ export default function EditStartupForm({ startup }: Props) {
         }
       }
     });
+    formData.set("logoUrl", logoUrl);
     const result = await updateStartup(startup.id, formData);
     if (result?.error) {
       setError(result.error);
@@ -95,6 +99,10 @@ export default function EditStartupForm({ startup }: Props) {
       <div>
         <h2 className="font-semibold text-neutral-900 mb-4 pb-2 border-b border-neutral-100">Basic Information</h2>
         <div className="space-y-4">
+          <div>
+            <Label className="mb-1.5 block">Logo</Label>
+            <ImageUpload value={logoUrl} onChange={setLogoUrl} label="Update Logo" aspectRatio="square" />
+          </div>
           <div>
             <Label htmlFor="name">Startup Name *</Label>
             <Input id="name" {...register("name")} className="mt-1.5" />

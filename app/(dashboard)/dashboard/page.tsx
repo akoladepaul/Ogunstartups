@@ -159,15 +159,20 @@ export default async function DashboardPage() {
               </div>
               <Badge variant={org.status as any}>{org.status}</Badge>
             </div>
-            {org.status === "approved" && (
-              <div className="mt-4">
+            <div className="flex gap-3 mt-4">
+              {org.status === "approved" && (
                 <Link href={`/organizations/${org.slug}`}>
                   <Button variant="outline" size="sm" className="gap-1">
                     <Eye className="h-3.5 w-3.5" /> View Live
                   </Button>
                 </Link>
-              </div>
-            )}
+              )}
+              <Link href={`/dashboard/organization/${org.id}/edit`}>
+                <Button variant="default" size="sm" className="gap-1">
+                  <Edit className="h-3.5 w-3.5" /> Edit Profile
+                </Button>
+              </Link>
+            </div>
           </div>
         )}
       </div>

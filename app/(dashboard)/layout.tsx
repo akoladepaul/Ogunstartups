@@ -3,16 +3,17 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/lib/actions/auth";
+import { getMyOrganization } from "@/lib/actions/organizations";
 import {
   Leaf, LayoutDashboard, Building2, Package, Settings, LogOut, Network,
 } from "lucide-react";
 import MobileNav from "@/components/layout/MobileNav";
 
-const navItems = [
+const baseNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { href: "/dashboard/startup", icon: Building2, label: "My Startup" },
   { href: "/dashboard/products", icon: Package, label: "Products" },
-  { href: "/dashboard/organization/new", icon: Network, label: "Organization" },
+  // org href resolved dynamically below
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -24,10 +25,20 @@ export default async function DashboardLayout({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { name: true, image: true, role: true },
-  });
+  const [user, org] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, image: true, role: true },
+    }),
+    getMyOrganization(),
+  ]);
+
+  const orgHref = org ? `/dashboard/organization/${org.id}/edit` : "/dashboard/organization/new";
+  const navItems = [
+    ...baseNavItems.slice(0, 3),
+    { href: orgHref, icon: Network, label: "Organization" },
+    ...baseNavItems.slice(3),
+  ];
 
   const userInitial =
     user?.name?.[0]?.toUpperCase() ?? session.user.email?.[0]?.toUpperCase() ?? "U";

@@ -79,6 +79,7 @@ export async function createOrganization(formData: FormData) {
       ownerId: session.user.id,
       name: parsed.data.name,
       slug: finalSlug,
+      logoUrl: (raw.logoUrl as string) || null,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
       orgType: parsed.data.org_type ?? null,
@@ -106,12 +107,15 @@ export async function updateOrganization(id: string, formData: FormData) {
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
 
+  const logoUrl = (raw.logoUrl as string) || undefined;
+
   await prisma.organization.updateMany({
     where: { id, ownerId: session.user.id },
     data: {
       name: parsed.data.name,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
+      logoUrl: logoUrl ?? undefined,
       orgType: parsed.data.org_type ?? null,
       lga: parsed.data.lga ?? null,
       foundedYear: parsed.data.founded_year ?? null,

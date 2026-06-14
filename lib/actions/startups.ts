@@ -117,12 +117,15 @@ export async function updateStartup(id: string, formData: FormData) {
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
 
+  const logoUrl = (raw.logoUrl as string) || undefined;
+
   await prisma.startup.updateMany({
     where: { id, founderId: session.user.id },
     data: {
       name: parsed.data.name,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
+      logoUrl: logoUrl ?? undefined,
       websiteUrl: parsed.data.website_url ?? null,
       category: parsed.data.category ?? null,
       stage: (parsed.data.stage as any) ?? null,
