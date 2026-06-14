@@ -87,6 +87,7 @@ export async function createStartup(formData: FormData) {
       slug: finalSlug,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
+      logoUrl: (raw.logoUrl as string) || null,
       websiteUrl: parsed.data.website_url ?? null,
       category: parsed.data.category ?? null,
       stage: (parsed.data.stage as any) ?? null,

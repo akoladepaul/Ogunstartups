@@ -16,10 +16,12 @@ import { createStartup } from "@/lib/actions/startups";
 import { SECTORS } from "@/constants/sectors";
 import { ALL_LGAS } from "@/constants/lgas";
 import { STAGES } from "@/constants/stages";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function StartupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState("");
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<StartupFormData>({
     resolver: zodResolver(startupSchema),
@@ -39,6 +41,7 @@ export default function StartupForm() {
         }
       }
     });
+    if (logoUrl) formData.set("logoUrl", logoUrl);
     const result = await createStartup(formData);
     if (result?.error) {
       setError(result.error);
@@ -52,6 +55,10 @@ export default function StartupForm() {
       <div>
         <h2 className="font-semibold text-neutral-900 mb-4 pb-2 border-b border-neutral-100">Basic Information</h2>
         <div className="space-y-4">
+          <div>
+            <Label className="mb-1.5 block">Logo</Label>
+            <ImageUpload value={logoUrl} onChange={setLogoUrl} label="Upload Logo" aspectRatio="square" />
+          </div>
           <div>
             <Label htmlFor="name">Startup Name *</Label>
             <Input id="name" {...register("name")} placeholder="e.g. AgroNova" className="mt-1.5" />
