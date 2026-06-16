@@ -129,7 +129,15 @@ export async function updateOrganization(id: string, formData: FormData) {
 }
 
 // Admin
+async function requireAdmin() {
+  const session = await auth();
+  if (!session?.user) return null;
+  if ((session.user as any).role !== "admin") return null;
+  return session;
+}
+
 export async function getAllOrganizationsAdmin(status?: string) {
+  if (!await requireAdmin()) return [];
   return prisma.organization.findMany({
     where: status ? { status: status as any } : undefined,
     orderBy: { createdAt: "desc" },
@@ -138,6 +146,7 @@ export async function getAllOrganizationsAdmin(status?: string) {
 }
 
 export async function approveOrganization(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.organization.update({ where: { id }, data: { status: "approved" } });
   revalidatePath("/admin/organizations");
   revalidatePath("/organizations");
@@ -145,6 +154,7 @@ export async function approveOrganization(id: string) {
 }
 
 export async function rejectOrganization(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.organization.update({ where: { id }, data: { status: "rejected" } });
   revalidatePath("/admin/organizations");
   return { success: true };

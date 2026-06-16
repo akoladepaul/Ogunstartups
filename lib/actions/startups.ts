@@ -169,7 +169,15 @@ export async function getStats() {
 }
 
 // Admin actions
+async function requireAdmin() {
+  const session = await auth();
+  if (!session?.user) return null;
+  if ((session.user as any).role !== "admin") return null;
+  return session;
+}
+
 export async function approveStartup(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { status: "approved" } });
   revalidatePath("/admin/startups");
   revalidatePath("/startups");
@@ -177,12 +185,14 @@ export async function approveStartup(id: string) {
 }
 
 export async function rejectStartup(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { status: "rejected" } });
   revalidatePath("/admin/startups");
   return { success: true };
 }
 
 export async function toggleFeatured(id: string, isFeatured: boolean) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { isFeatured } });
   revalidatePath("/admin/startups");
   revalidatePath("/");
@@ -190,6 +200,7 @@ export async function toggleFeatured(id: string, isFeatured: boolean) {
 }
 
 export async function getAllStartupsAdmin(status?: string) {
+  if (!await requireAdmin()) return [];
   return prisma.startup.findMany({
     where: status ? { status: status as any } : undefined,
     orderBy: { createdAt: "desc" },
