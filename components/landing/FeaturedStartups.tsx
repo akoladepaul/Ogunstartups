@@ -16,16 +16,16 @@ export default function FeaturedStartups({ startups }: FeaturedStartupsProps) {
   return (
     <section className="section-padding bg-white">
       <div className="section-container">
-        <div className="flex items-end justify-between mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8 sm:mb-10">
           <div>
             <h2 className="heading-2 text-neutral-900 mb-2">Featured Startups</h2>
-            <p className="text-neutral-500 max-w-lg">
+            <p className="text-neutral-500 max-w-lg text-sm sm:text-base">
               Hand-picked from Ogun State&apos;s most promising ventures across every sector and LGA.
             </p>
           </div>
           <Link
             href="/startups"
-            className="hidden sm:flex items-center gap-1 text-sm font-medium text-brand-green-600 hover:text-brand-green-700"
+            className="hidden sm:flex items-center gap-1 text-sm font-medium text-brand-green-600 hover:text-brand-green-700 shrink-0"
           >
             View All <ArrowRight className="h-4 w-4" />
           </Link>

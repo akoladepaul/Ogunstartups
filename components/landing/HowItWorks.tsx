@@ -28,14 +28,14 @@ export default function HowItWorks() {
   return (
     <section className="section-padding bg-neutral-50">
       <div className="section-container">
-        <div className="text-center mb-14">
+        <div className="text-center mb-10 sm:mb-14">
           <h2 className="heading-2 text-neutral-900 mb-3">How It Works</h2>
-          <p className="text-neutral-500 max-w-lg mx-auto">
+          <p className="text-neutral-500 max-w-lg mx-auto text-sm sm:text-base">
             Get your startup listed on OgunStartups in three simple steps.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
+        <div className="grid md:grid-cols-3 gap-6 sm:gap-8 relative">
           {/* Connecting line */}
           <div className="absolute hidden md:block top-10 left-1/3 right-1/3 h-px border-t-2 border-dashed border-brand-green-200" />
 

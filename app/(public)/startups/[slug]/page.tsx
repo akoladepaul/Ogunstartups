@@ -52,7 +52,7 @@ export default async function StartupProfilePage({ params }: PageProps) {
       </div>
 
       {/* Cover */}
-      <div className="h-48 sm:h-64 bg-gradient-to-br from-brand-green-100 to-brand-green-200 relative">
+      <div className="h-32 sm:h-48 lg:h-64 bg-gradient-to-br from-brand-green-100 to-brand-green-200 relative">
         {startup.coverUrl && (
           <img src={startup.coverUrl} alt="" className="w-full h-full object-cover" />
         )}
@@ -60,30 +60,34 @@ export default async function StartupProfilePage({ params }: PageProps) {
 
       <div className="section-container">
         {/* Profile header */}
-        <div className="bg-white rounded-2xl border border-neutral-100 p-6 -mt-10 mb-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="-mt-14 shrink-0">
+        <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm -mt-6 sm:-mt-10 mb-6">
+          {/* Logo strip */}
+          <div className="px-4 sm:px-6 pt-0">
+            <div className="inline-block -mt-8 sm:-mt-12">
               {startup.logoUrl ? (
                 <img
                   src={startup.logoUrl}
                   alt={startup.name}
-                  className="h-20 w-20 rounded-2xl border-4 border-white shadow-md object-cover"
+                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl border-4 border-white shadow-md object-cover"
                 />
               ) : (
-                <div className="h-20 w-20 rounded-2xl border-4 border-white shadow-md bg-brand-green-600 flex items-center justify-center text-white font-bold text-xl">
+                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl border-4 border-white shadow-md bg-brand-green-600 flex items-center justify-center text-white font-bold text-lg sm:text-xl">
                   {getInitials(startup.name)}
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="flex-1">
+          {/* Info row */}
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 mt-2 flex flex-col sm:flex-row sm:items-start gap-4">
+            <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-neutral-900">{startup.name}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 break-words">{startup.name}</h1>
                 {startup.status === "approved" && (
-                  <BadgeCheck className="h-5 w-5 text-brand-green-600" />
+                  <BadgeCheck className="h-5 w-5 text-brand-green-600 shrink-0" />
                 )}
               </div>
-              <p className="text-neutral-600 mb-3">{startup.tagline}</p>
+              <p className="text-sm sm:text-base text-neutral-600 mb-3 leading-snug">{startup.tagline}</p>
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {(Array.isArray((startup as any).categories) ? (startup as any).categories as string[] : startup.category ? [startup.category] : []).map((cat: string) => (
@@ -130,8 +134,8 @@ export default async function StartupProfilePage({ params }: PageProps) {
             </div>
 
             {startup.websiteUrl && (
-              <a href={startup.websiteUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="default" size="sm" className="shrink-0">
+              <a href={startup.websiteUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                <Button variant="default" size="sm" className="w-full sm:w-auto">
                   Visit Website
                 </Button>
               </a>

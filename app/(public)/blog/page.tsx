@@ -45,13 +45,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
   return (
     <div className="pt-16 min-h-screen bg-neutral-50">
-      <div className="bg-brand-green-900 text-white py-16">
+      <div className="bg-brand-green-900 text-white py-10 sm:py-16">
         <div className="section-container text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-green-800 rounded-full px-4 py-1.5 text-sm mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-green-800 rounded-full px-4 py-1.5 text-sm mb-3 sm:mb-4">
             📰 Press Room
           </div>
-          <h1 className="heading-2 text-white mb-3">Blog & Innovation Stories</h1>
-          <p className="text-brand-green-200 max-w-xl mx-auto">
+          <h1 className="heading-2 text-white mb-2 sm:mb-3">Blog & Innovation Stories</h1>
+          <p className="text-brand-green-200 max-w-xl mx-auto text-sm sm:text-base">
             Press releases, founder stories, ecosystem news, and insights from
             Ogun State&apos;s growing innovation community.
           </p>
@@ -77,7 +77,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="section-container py-12">
+      <div className="section-container py-6 sm:py-12">
         {result.data.length === 0 ? (
           <div className="text-center py-20 text-neutral-500">
             No posts published yet. Check back soon.
@@ -85,10 +85,10 @@ export default async function BlogPage({ searchParams }: PageProps) {
         ) : (
           <>
             {page === 1 && result.data[0] && (
-              <Link href={`/blog/${result.data[0].slug}`} className="block mb-12">
+              <Link href={`/blog/${result.data[0].slug}`} className="block mb-6 sm:mb-12">
                 <article className="bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-lg transition-shadow group">
                   <div className="grid md:grid-cols-2">
-                    <div className="h-64 md:h-auto bg-gradient-to-br from-brand-green-100 to-brand-green-50">
+                    <div className="h-48 sm:h-64 md:h-auto bg-gradient-to-br from-brand-green-100 to-brand-green-50">
                       {result.data[0].coverImageUrl && (
                         <img
                           src={result.data[0].coverImageUrl}
@@ -97,7 +97,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                         />
                       )}
                     </div>
-                    <div className="p-8 flex flex-col justify-center">
+                    <div className="p-5 sm:p-8 flex flex-col justify-center">
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize ${
                           categoryVariant[result.data[0].category] ?? "bg-neutral-100 text-neutral-700"
