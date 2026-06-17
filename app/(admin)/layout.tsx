@@ -70,7 +70,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex-1 overflow-auto">
         <header className="bg-white border-b border-neutral-100 px-4 md:px-6 py-4 flex items-center gap-4">
-          <AdminMobileNav items={adminNav} userName={user?.name ?? ""} />
+          <AdminMobileNav userName={user?.name ?? ""} />
           <p className="text-xs text-neutral-500 font-medium uppercase tracking-wide">
             OgunStartups Admin
           </p>

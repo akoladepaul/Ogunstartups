@@ -2,25 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, Building2, Package, Settings, Network } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
-import type { LucideIcon } from "lucide-react";
-
-interface NavItem {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-}
 
 interface Props {
-  items: NavItem[];
+  orgHref: string;
   userInitial: string;
   userName: string;
   userRole: string;
 }
 
-export default function MobileNav({ items, userInitial, userName, userRole }: Props) {
+export default function MobileNav({ orgHref, userInitial, userName, userRole }: Props) {
   const [open, setOpen] = useState(false);
+
+  const navItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
+    { href: "/dashboard/startup", icon: Building2, label: "My Startup" },
+    { href: "/dashboard/products", icon: Package, label: "Products" },
+    { href: orgHref, icon: Network, label: "Organization" },
+    { href: "/dashboard/settings", icon: Settings, label: "Settings" },
+  ];
 
   return (
     <>
@@ -46,7 +47,7 @@ export default function MobileNav({ items, userInitial, userName, userRole }: Pr
             </div>
 
             <nav className="flex-1 space-y-1">
-              {items.map((item) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link

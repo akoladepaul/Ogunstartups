@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Leaf, LogOut } from "lucide-react";
+import { Menu, X, Leaf, LogOut, LayoutDashboard, Clock, Building2, Newspaper, Users, BarChart3 } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 
-type NavItem = { href: string; icon: React.ElementType; label: string };
+const adminNav = [
+  { href: "/admin", icon: LayoutDashboard, label: "Overview" },
+  { href: "/admin/pending", icon: Clock, label: "Pending Review" },
+  { href: "/admin/startups", icon: Building2, label: "Startups" },
+  { href: "/admin/organizations", icon: Building2, label: "Organizations" },
+  { href: "/admin/blog", icon: Newspaper, label: "Blog / Press" },
+  { href: "/admin/users", icon: Users, label: "Users" },
+  { href: "/admin/analytics", icon: BarChart3, label: "Analytics" },
+];
 
-export default function AdminMobileNav({
-  items,
-  userName,
-}: {
-  items: NavItem[];
-  userName: string;
-}) {
+export default function AdminMobileNav({ userName }: { userName: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -51,7 +53,7 @@ export default function AdminMobileNav({
             </div>
 
             <nav className="flex-1 space-y-1">
-              {items.map((item) => {
+              {adminNav.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
