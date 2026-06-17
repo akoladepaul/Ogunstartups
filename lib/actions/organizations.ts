@@ -66,6 +66,7 @@ export async function createOrganization(formData: FormData) {
   const parsed = orgSchema.safeParse({
     ...raw,
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    social_links: raw.social_links ? (() => { try { return JSON.parse(String(raw.social_links)); } catch { return {}; } })() : {},
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
@@ -103,6 +104,7 @@ export async function updateOrganization(id: string, formData: FormData) {
   const parsed = orgSchema.safeParse({
     ...raw,
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    social_links: raw.social_links ? (() => { try { return JSON.parse(String(raw.social_links)); } catch { return {}; } })() : {},
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
