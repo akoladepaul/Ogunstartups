@@ -59,11 +59,11 @@ export default function StartupCard({ startup }: { startup: Startup }) {
 
           {/* Badges */}
           <div className="flex flex-wrap gap-1.5">
-            {startup.category && (
-              <Badge variant="sector" className="text-xs">
-                {SECTOR_MAP[startup.category] ?? startup.category}
+            {(Array.isArray(startup.categories) ? startup.categories : startup.category ? [startup.category] : []).slice(0, 2).map((cat) => (
+              <Badge key={cat} variant="sector" className="text-xs">
+                {SECTOR_MAP[cat] ?? cat}
               </Badge>
-            )}
+            ))}
             {startup.stage && (
               <Badge variant="stage" className="text-xs capitalize">
                 {startup.stage}

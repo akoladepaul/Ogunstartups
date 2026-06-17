@@ -104,6 +104,7 @@ model Startup {
   coverUrl    String?  @map("cover_url")
   websiteUrl  String?  @map("website_url")
   category    String?
+  categories  Json     @default("[]")
   stage       Stage?
   foundedYear Int?     @map("founded_year")
   location    String   @default("Ogun State, Nigeria")

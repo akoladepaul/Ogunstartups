@@ -4,7 +4,7 @@ export const startupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   tagline: z.string().min(10, "Tagline must be at least 10 characters").max(150),
   description: z.string().min(50, "Description must be at least 50 characters").max(2000),
-  category: z.string().min(1, "Please select a sector"),
+  categories: z.array(z.string()).min(1, "Please select at least one sector").max(3, "Maximum 3 sectors allowed"),
   stage: z.enum(["idea", "mvp", "growth", "scale"]),
   lga: z.string().min(1, "Please select an LGA"),
   founded_year: z.coerce

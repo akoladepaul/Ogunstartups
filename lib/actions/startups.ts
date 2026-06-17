@@ -72,6 +72,7 @@ export async function createStartup(formData: FormData) {
     ...raw,
     is_hiring: raw.is_hiring === "on",
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    categories: raw.categories ? String(raw.categories).split(",").map((t) => t.trim()).filter(Boolean) : [],
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
@@ -89,7 +90,8 @@ export async function createStartup(formData: FormData) {
       description: parsed.data.description ?? null,
       logoUrl: (raw.logoUrl as string) || null,
       websiteUrl: parsed.data.website_url ?? null,
-      category: parsed.data.category ?? null,
+      category: parsed.data.categories[0] ?? null,
+      categories: parsed.data.categories,
       stage: (parsed.data.stage as any) ?? null,
       foundedYear: parsed.data.founded_year ?? null,
       lga: parsed.data.lga ?? null,
@@ -113,6 +115,7 @@ export async function updateStartup(id: string, formData: FormData) {
     ...raw,
     is_hiring: raw.is_hiring === "on",
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    categories: raw.categories ? String(raw.categories).split(",").map((t) => t.trim()).filter(Boolean) : [],
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
@@ -127,7 +130,8 @@ export async function updateStartup(id: string, formData: FormData) {
       description: parsed.data.description ?? null,
       logoUrl: logoUrl ?? undefined,
       websiteUrl: parsed.data.website_url ?? null,
-      category: parsed.data.category ?? null,
+      category: parsed.data.categories[0] ?? null,
+      categories: parsed.data.categories,
       stage: (parsed.data.stage as any) ?? null,
       foundedYear: parsed.data.founded_year ?? null,
       lga: parsed.data.lga ?? null,

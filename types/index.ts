@@ -35,6 +35,7 @@ export interface Startup {
   coverUrl: string | null;
   websiteUrl: string | null;
   category: string | null;
+  categories: string[];
   stage: StartupStage | null;
   foundedYear: number | null;
   location: string;

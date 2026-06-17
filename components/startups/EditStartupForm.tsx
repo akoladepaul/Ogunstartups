@@ -12,9 +12,9 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { SECTORS } from "@/constants/sectors";
 import { startupSchema, type StartupFormData } from "@/lib/validations/startup";
 import { updateStartup } from "@/lib/actions/startups";
-import { SECTORS } from "@/constants/sectors";
 import { ALL_LGAS } from "@/constants/lgas";
 import { STAGES } from "@/constants/stages";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -26,6 +26,7 @@ interface Props {
     tagline: string | null;
     description: string | null;
     category: string | null;
+    categories: unknown;
     stage: string | null;
     lga: string | null;
     foundedYear: number | null;
@@ -46,6 +47,23 @@ export default function EditStartupForm({ startup }: Props) {
 
   const socialLinks = (startup.socialLinks ?? {}) as Record<string, string>;
   const tags = Array.isArray(startup.tags) ? (startup.tags as string[]) : [];
+  const existingCategories = Array.isArray(startup.categories)
+    ? (startup.categories as string[])
+    : startup.category ? [startup.category] : [];
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(existingCategories);
+
+  const toggleCategory = (value: string) => {
+    let next: string[];
+    if (selectedCategories.includes(value)) {
+      next = selectedCategories.filter((c) => c !== value);
+    } else if (selectedCategories.length < 3) {
+      next = [...selectedCategories, value];
+    } else {
+      return;
+    }
+    setSelectedCategories(next);
+    setValue("categories", next, { shouldValidate: true });
+  };
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<StartupFormData>({
     resolver: zodResolver(startupSchema),
@@ -53,7 +71,7 @@ export default function EditStartupForm({ startup }: Props) {
       name: startup.name,
       tagline: startup.tagline ?? "",
       description: startup.description ?? "",
-      category: startup.category ?? "",
+      categories: existingCategories,
       stage: (startup.stage as any) ?? undefined,
       lga: startup.lga ?? "",
       founded_year: startup.foundedYear ?? undefined,
@@ -76,7 +94,9 @@ export default function EditStartupForm({ startup }: Props) {
     const formData = new FormData();
     Object.entries(data).forEach(([k, v]) => {
       if (v !== null && v !== undefined) {
-        if (typeof v === "object") {
+        if (k === "categories" && Array.isArray(v)) {
+          formData.set(k, (v as string[]).join(","));
+        } else if (typeof v === "object") {
           formData.set(k, JSON.stringify(v));
         } else {
           formData.set(k, String(v));
@@ -123,15 +143,40 @@ export default function EditStartupForm({ startup }: Props) {
 
       <div>
         <h2 className="font-semibold text-neutral-900 mb-4 pb-2 border-b border-neutral-100">Sector & Stage</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div>
-            <Label>Sector *</Label>
-            <Select defaultValue={startup.category ?? undefined} onValueChange={(v) => setValue("category", v)}>
-              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select sector" /></SelectTrigger>
-              <SelectContent>
-                {SECTORS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <Label>
+              Sector * <span className="text-neutral-400 font-normal">(pick up to 3)</span>
+            </Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {SECTORS.map((s) => {
+                const selected = selectedCategories.includes(s.value);
+                const maxReached = selectedCategories.length >= 3;
+                return (
+                  <button
+                    key={s.value}
+                    type="button"
+                    disabled={!selected && maxReached}
+                    onClick={() => toggleCategory(s.value)}
+                    className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
+                      selected
+                        ? "bg-brand-green-600 text-white border-brand-green-600"
+                        : maxReached
+                        ? "bg-neutral-50 text-neutral-300 border-neutral-100 cursor-not-allowed"
+                        : "bg-white text-neutral-600 border-neutral-200 hover:border-brand-green-400 hover:text-brand-green-700"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-neutral-400 mt-1.5">
+              {selectedCategories.length} / 3 selected
+            </p>
+            {errors.categories && (
+              <p className="text-xs text-red-500 mt-1">{(errors.categories as any).message ?? "Please select at least one sector"}</p>
+            )}
           </div>
           <div>
             <Label>Stage *</Label>
