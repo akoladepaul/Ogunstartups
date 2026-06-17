@@ -2,9 +2,10 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMyStartup } from "@/lib/actions/startups";
+import { getMyOrganization } from "@/lib/actions/organizations";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Eye, Edit, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Plus, Eye, Edit, AlertCircle, CheckCircle, Clock, Network } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -13,7 +14,7 @@ export default async function DashboardPage() {
     select: { name: true },
   });
 
-  const startup = await getMyStartup();
+  const [startup, org] = await Promise.all([getMyStartup(), getMyOrganization()]);
 
   const statusConfig = {
     pending: {
@@ -131,6 +132,50 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Organization section */}
+      <div className="mt-8 max-w-2xl">
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">Your Organization</h2>
+        {!org ? (
+          <div className="bg-white rounded-2xl border border-neutral-100 p-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-neutral-700">No organization listed</p>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Register an accelerator, incubator, or support organization.
+              </p>
+            </div>
+            <Link href="/dashboard/organization/new">
+              <Button variant="outline" size="sm" className="gap-1 shrink-0">
+                <Network className="h-3.5 w-3.5" /> Register
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-neutral-100 p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-neutral-900">{org.name}</h3>
+                <p className="text-neutral-500 text-sm mt-0.5">{org.tagline}</p>
+              </div>
+              <Badge variant={org.status as any}>{org.status}</Badge>
+            </div>
+            <div className="flex gap-3 mt-4">
+              {org.status === "approved" && (
+                <Link href={`/organizations/${org.slug}`}>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <Eye className="h-3.5 w-3.5" /> View Live
+                  </Button>
+                </Link>
+              )}
+              <Link href={`/dashboard/organization/${org.id}/edit`}>
+                <Button variant="default" size="sm" className="gap-1">
+                  <Edit className="h-3.5 w-3.5" /> Edit Profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

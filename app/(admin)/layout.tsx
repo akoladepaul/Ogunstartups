@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/lib/actions/auth";
+import AdminMobileNav from "@/components/layout/AdminMobileNav";
 import {
   Leaf, LayoutDashboard, Building2, Users, BarChart3,
   Clock, LogOut, Newspaper,
@@ -68,12 +69,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex-1 overflow-auto">
-        <header className="bg-white border-b border-neutral-100 px-6 py-4">
+        <header className="bg-white border-b border-neutral-100 px-4 md:px-6 py-4 flex items-center gap-4">
+          <AdminMobileNav items={adminNav} userName={user?.name ?? ""} />
           <p className="text-xs text-neutral-500 font-medium uppercase tracking-wide">
             OgunStartups Admin
           </p>
         </header>
-        <main className="p-6 lg:p-8">{children}</main>
+        <main className="p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

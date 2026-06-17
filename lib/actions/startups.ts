@@ -72,6 +72,8 @@ export async function createStartup(formData: FormData) {
     ...raw,
     is_hiring: raw.is_hiring === "on",
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    categories: raw.categories ? String(raw.categories).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    social_links: raw.social_links ? (() => { try { return JSON.parse(String(raw.social_links)); } catch { return {}; } })() : {},
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
@@ -87,8 +89,10 @@ export async function createStartup(formData: FormData) {
       slug: finalSlug,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
+      logoUrl: (raw.logoUrl as string) || null,
       websiteUrl: parsed.data.website_url ?? null,
-      category: parsed.data.category ?? null,
+      category: parsed.data.categories[0] ?? null,
+      categories: parsed.data.categories,
       stage: (parsed.data.stage as any) ?? null,
       foundedYear: parsed.data.founded_year ?? null,
       lga: parsed.data.lga ?? null,
@@ -112,9 +116,13 @@ export async function updateStartup(id: string, formData: FormData) {
     ...raw,
     is_hiring: raw.is_hiring === "on",
     tags: raw.tags ? String(raw.tags).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    categories: raw.categories ? String(raw.categories).split(",").map((t) => t.trim()).filter(Boolean) : [],
+    social_links: raw.social_links ? (() => { try { return JSON.parse(String(raw.social_links)); } catch { return {}; } })() : {},
   });
 
   if (!parsed.success) return { error: parsed.error.errors[0].message };
+
+  const logoUrl = (raw.logoUrl as string) || undefined;
 
   await prisma.startup.updateMany({
     where: { id, founderId: session.user.id },
@@ -122,8 +130,10 @@ export async function updateStartup(id: string, formData: FormData) {
       name: parsed.data.name,
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
+      logoUrl: logoUrl ?? undefined,
       websiteUrl: parsed.data.website_url ?? null,
-      category: parsed.data.category ?? null,
+      category: parsed.data.categories[0] ?? null,
+      categories: parsed.data.categories,
       stage: (parsed.data.stage as any) ?? null,
       foundedYear: parsed.data.founded_year ?? null,
       lga: parsed.data.lga ?? null,
@@ -135,6 +145,15 @@ export async function updateStartup(id: string, formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath(`/startups/${id}`);
   return { success: true };
+}
+
+export async function getStartupById(id: string) {
+  const session = await auth();
+  if (!session?.user) return null;
+  return prisma.startup.findFirst({
+    where: { id, founderId: session.user.id },
+    include: { products: true },
+  });
 }
 
 export async function getMyStartup() {
@@ -156,7 +175,15 @@ export async function getStats() {
 }
 
 // Admin actions
+async function requireAdmin() {
+  const session = await auth();
+  if (!session?.user) return null;
+  if ((session.user as any).role !== "admin") return null;
+  return session;
+}
+
 export async function approveStartup(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { status: "approved" } });
   revalidatePath("/admin/startups");
   revalidatePath("/startups");
@@ -164,12 +191,14 @@ export async function approveStartup(id: string) {
 }
 
 export async function rejectStartup(id: string) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { status: "rejected" } });
   revalidatePath("/admin/startups");
   return { success: true };
 }
 
 export async function toggleFeatured(id: string, isFeatured: boolean) {
+  if (!await requireAdmin()) return { error: "Unauthorized" };
   await prisma.startup.update({ where: { id }, data: { isFeatured } });
   revalidatePath("/admin/startups");
   revalidatePath("/");
@@ -177,6 +206,7 @@ export async function toggleFeatured(id: string, isFeatured: boolean) {
 }
 
 export async function getAllStartupsAdmin(status?: string) {
+  if (!await requireAdmin()) return [];
   return prisma.startup.findMany({
     where: status ? { status: status as any } : undefined,
     orderBy: { createdAt: "desc" },

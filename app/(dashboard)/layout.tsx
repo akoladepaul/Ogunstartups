@@ -3,14 +3,17 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/lib/actions/auth";
+import { getMyOrganization } from "@/lib/actions/organizations";
 import {
-  Leaf, LayoutDashboard, Building2, Package, Settings, LogOut,
+  Leaf, LayoutDashboard, Building2, Package, Settings, LogOut, Network,
 } from "lucide-react";
+import MobileNav from "@/components/layout/MobileNav";
 
-const navItems = [
+const baseNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { href: "/dashboard/startup", icon: Building2, label: "My Startup" },
   { href: "/dashboard/products", icon: Package, label: "Products" },
+  // org href resolved dynamically below
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -22,14 +25,27 @@ export default async function DashboardLayout({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { name: true, image: true, role: true },
-  });
+  const [user, org] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, image: true, role: true },
+    }),
+    getMyOrganization(),
+  ]);
+
+  const orgHref = org ? `/dashboard/organization/${org.id}/edit` : "/dashboard/organization/new";
+  const navItems = [
+    ...baseNavItems.slice(0, 3),
+    { href: orgHref, icon: Network, label: "Organization" },
+    ...baseNavItems.slice(3),
+  ];
+
+  const userInitial =
+    user?.name?.[0]?.toUpperCase() ?? session.user.email?.[0]?.toUpperCase() ?? "U";
 
   return (
     <div className="min-h-screen bg-neutral-50 flex">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col bg-white border-r border-neutral-100 p-5">
         <Link href="/" className="flex items-center gap-2 mb-8">
           <div className="h-7 w-7 rounded-lg bg-brand-green-600 flex items-center justify-center">
@@ -56,11 +72,10 @@ export default async function DashboardLayout({
           })}
         </nav>
 
-        {/* User */}
         <div className="border-t border-neutral-100 pt-4">
           <div className="flex items-center gap-2 px-3 py-2 mb-1">
             <div className="h-7 w-7 rounded-full bg-brand-green-100 flex items-center justify-center text-brand-green-700 text-xs font-bold">
-              {user?.name?.[0]?.toUpperCase() ?? session.user.email?.[0]?.toUpperCase() ?? "U"}
+              {userInitial}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-medium text-neutral-800 truncate">
@@ -79,7 +94,24 @@ export default async function DashboardLayout({
 
       {/* Main */}
       <div className="flex-1 overflow-auto">
-        <main className="p-6 lg:p-8">{children}</main>
+        {/* Mobile top bar */}
+        <div className="md:hidden bg-white border-b border-neutral-100 px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-lg bg-brand-green-600 flex items-center justify-center">
+              <Leaf className="h-3 w-3 text-white" />
+            </div>
+            <span className="text-sm font-bold text-brand-green-700">
+              Ogun<span className="text-neutral-900">Startups</span>
+            </span>
+          </Link>
+          <MobileNav
+            items={navItems}
+            userInitial={userInitial}
+            userName={user?.name ?? session.user.email ?? ""}
+            userRole={user?.role ?? "founder"}
+          />
+        </div>
+        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

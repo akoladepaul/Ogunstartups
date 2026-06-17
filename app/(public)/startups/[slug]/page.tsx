@@ -86,9 +86,9 @@ export default async function StartupProfilePage({ params }: PageProps) {
               <p className="text-neutral-600 mb-3">{startup.tagline}</p>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                {startup.category && (
-                  <Badge variant="sector">{SECTOR_MAP[startup.category] ?? startup.category}</Badge>
-                )}
+                {(Array.isArray((startup as any).categories) ? (startup as any).categories as string[] : startup.category ? [startup.category] : []).map((cat: string) => (
+                  <Badge key={cat} variant="sector">{SECTOR_MAP[cat] ?? cat}</Badge>
+                ))}
                 {startup.stage && (
                   <Badge variant="stage" className="capitalize">{startup.stage}</Badge>
                 )}
