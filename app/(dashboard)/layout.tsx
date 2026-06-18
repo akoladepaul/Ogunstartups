@@ -9,11 +9,11 @@ import {
 } from "lucide-react";
 import MobileNav from "@/components/layout/MobileNav";
 
-const baseNavItems = [
+const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { href: "/dashboard/startup", icon: Building2, label: "My Startup" },
   { href: "/dashboard/products", icon: Package, label: "Products" },
-  // org href resolved dynamically below
+  { href: "/dashboard/organization/new", icon: Network, label: "Organization" },
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -34,11 +34,6 @@ export default async function DashboardLayout({
   ]);
 
   const orgHref = org ? `/dashboard/organization/${org.id}/edit` : "/dashboard/organization/new";
-  const navItems = [
-    ...baseNavItems.slice(0, 3),
-    { href: orgHref, icon: Network, label: "Organization" },
-    ...baseNavItems.slice(3),
-  ];
 
   const userInitial =
     user?.name?.[0]?.toUpperCase() ?? session.user.email?.[0]?.toUpperCase() ?? "U";
@@ -105,7 +100,7 @@ export default async function DashboardLayout({
             </span>
           </Link>
           <MobileNav
-            items={navItems}
+            orgHref={orgHref}
             userInitial={userInitial}
             userName={user?.name ?? session.user.email ?? ""}
             userRole={user?.role ?? "founder"}
