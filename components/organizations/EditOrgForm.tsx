@@ -26,6 +26,7 @@ const ORG_TYPES = [
   { value: "ngo", label: "NGO / Foundation" },
   { value: "university_hub", label: "University Hub" },
   { value: "corporate_program", label: "Corporate Program" },
+  { value: "venture_support", label: "Venture Support" },
 ];
 
 interface Props {
