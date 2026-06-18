@@ -90,6 +90,7 @@ export async function createStartup(formData: FormData) {
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
       logoUrl: (raw.logoUrl as string) || null,
+      coverUrl: (raw.coverUrl as string) || null,
       websiteUrl: parsed.data.website_url ?? null,
       category: parsed.data.categories[0] ?? null,
       categories: parsed.data.categories,
@@ -123,6 +124,7 @@ export async function updateStartup(id: string, formData: FormData) {
   if (!parsed.success) return { error: parsed.error.errors[0].message };
 
   const logoUrl = (raw.logoUrl as string) || undefined;
+  const coverUrl = (raw.coverUrl as string) || undefined;
 
   await prisma.startup.updateMany({
     where: { id, founderId: session.user.id },
@@ -131,6 +133,7 @@ export async function updateStartup(id: string, formData: FormData) {
       tagline: parsed.data.tagline ?? null,
       description: parsed.data.description ?? null,
       logoUrl: logoUrl ?? undefined,
+      coverUrl: coverUrl ?? undefined,
       websiteUrl: parsed.data.website_url ?? null,
       category: parsed.data.categories[0] ?? null,
       categories: parsed.data.categories,

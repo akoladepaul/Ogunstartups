@@ -32,6 +32,7 @@ interface Props {
     foundedYear: number | null;
     websiteUrl: string | null;
     logoUrl: string | null;
+    coverUrl: string | null;
     isHiring: boolean;
     tags: unknown;
     socialLinks: unknown;
@@ -44,6 +45,7 @@ export default function EditStartupForm({ startup }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [logoUrl, setLogoUrl] = useState(startup.logoUrl ?? "");
+  const [coverUrl, setCoverUrl] = useState(startup.coverUrl ?? "");
 
   const socialLinks = (startup.socialLinks ?? {}) as Record<string, string>;
   const tags = Array.isArray(startup.tags) ? (startup.tags as string[]) : [];
@@ -104,6 +106,7 @@ export default function EditStartupForm({ startup }: Props) {
       }
     });
     formData.set("logoUrl", logoUrl);
+    formData.set("coverUrl", coverUrl);
     const result = await updateStartup(startup.id, formData);
     if (result?.error) {
       setError(result.error);
@@ -119,6 +122,10 @@ export default function EditStartupForm({ startup }: Props) {
       <div>
         <h2 className="font-semibold text-neutral-900 mb-4 pb-2 border-b border-neutral-100">Basic Information</h2>
         <div className="space-y-4">
+          <div>
+            <Label className="mb-1.5 block">Banner Image <span className="text-neutral-400 font-normal">(cover photo shown on your profile)</span></Label>
+            <ImageUpload value={coverUrl} onChange={setCoverUrl} label="Update Banner" aspectRatio="wide" />
+          </div>
           <div>
             <Label className="mb-1.5 block">Logo</Label>
             <ImageUpload value={logoUrl} onChange={setLogoUrl} label="Update Logo" aspectRatio="square" />

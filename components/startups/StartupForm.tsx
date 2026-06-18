@@ -22,6 +22,7 @@ export default function StartupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<StartupFormData>({
@@ -58,6 +59,7 @@ export default function StartupForm() {
       }
     });
     if (logoUrl) formData.set("logoUrl", logoUrl);
+    if (coverUrl) formData.set("coverUrl", coverUrl);
     const result = await createStartup(formData);
     if (result?.error) {
       setError(result.error);
@@ -71,6 +73,10 @@ export default function StartupForm() {
       <div>
         <h2 className="font-semibold text-neutral-900 mb-4 pb-2 border-b border-neutral-100">Basic Information</h2>
         <div className="space-y-4">
+          <div>
+            <Label className="mb-1.5 block">Banner Image <span className="text-neutral-400 font-normal">(cover photo shown on your profile)</span></Label>
+            <ImageUpload value={coverUrl} onChange={setCoverUrl} label="Upload Banner" aspectRatio="wide" />
+          </div>
           <div>
             <Label className="mb-1.5 block">Logo</Label>
             <ImageUpload value={logoUrl} onChange={setLogoUrl} label="Upload Logo" aspectRatio="square" />
