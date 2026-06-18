@@ -18,58 +18,55 @@ export default function HeroSection() {
       {/* Green blob */}
       <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-brand-green-100 rounded-full blur-3xl opacity-40 -translate-y-1/4 translate-x-1/4" />
 
-      <div className="relative section-container pt-24 pb-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative section-container pt-20 sm:pt-24 pb-12 sm:pb-16">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left column */}
           <div className="animate-slide-up">
-            <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 rounded-full px-4 py-1.5 text-sm font-medium mb-5 sm:mb-6">
               <MapPin className="h-3.5 w-3.5" />
               Ogun State, Nigeria
             </div>
 
-            <h1 className="heading-1 text-neutral-900 mb-6">
+            <h1 className="heading-1 text-neutral-900 mb-4 sm:mb-6">
               Discover Ogun State&apos;s{" "}
               <span className="text-brand-green-600">Innovation</span>{" "}
               Ecosystem
             </h1>
 
-            <p className="text-lg text-neutral-600 leading-relaxed mb-8 max-w-xl">
+            <p className="text-base sm:text-lg text-neutral-600 leading-relaxed mb-6 sm:mb-8 max-w-xl">
               The definitive digital directory for startups, innovation hubs,
               and business support organizations across all 20 LGAs of Ogun
               State. Connect, grow, and build the future of Nigeria&apos;s
               Gateway State.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-10">
+            <div className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-8 sm:mb-10">
               <Link href="/startups">
-                <Button variant="default" size="lg" className="gap-2">
+                <Button variant="default" size="lg" className="gap-2 w-full xs:w-auto">
                   Explore Directory <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="green-outline" size="lg">
+                <Button variant="green-outline" size="lg" className="w-full xs:w-auto">
                   Register Your Startup
                 </Button>
               </Link>
             </div>
 
             {/* Social proof */}
-            <div className="flex flex-wrap gap-6 text-sm text-neutral-500">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-6 text-sm text-neutral-500">
               <div>
                 <span className="font-bold text-neutral-900 text-base">150+</span>{" "}
                 Startups
               </div>
-              <div className="w-px bg-neutral-200" />
               <div>
                 <span className="font-bold text-neutral-900 text-base">20</span>{" "}
                 LGAs
               </div>
-              <div className="w-px bg-neutral-200" />
               <div>
                 <span className="font-bold text-neutral-900 text-base">13</span>{" "}
                 Sectors
               </div>
-              <div className="w-px bg-neutral-200" />
               <div>
                 <span className="font-bold text-neutral-900 text-base">30+</span>{" "}
                 Support Orgs
