@@ -42,16 +42,16 @@ export default async function OrganizationsPage() {
   return (
     <div className="pt-16 min-h-screen bg-neutral-50">
       <div className="bg-white border-b border-neutral-100">
-        <div className="section-container py-12">
-          <h1 className="heading-2 text-neutral-900 mb-2">Support Organizations</h1>
-          <p className="text-neutral-500 max-w-2xl">
+        <div className="section-container py-6 sm:py-12">
+          <h1 className="heading-2 text-neutral-900 mb-1 sm:mb-2">Support Organizations</h1>
+          <p className="text-neutral-500 max-w-2xl text-sm sm:text-base">
             Incubators, accelerators, co-working spaces, angel networks, and
             government agencies supporting entrepreneurs across Ogun State.
           </p>
         </div>
       </div>
 
-      <div className="section-container py-10">
+      <div className="section-container py-6 sm:py-10">
         {orgs.length === 0 ? (
           <div className="text-center py-20 text-neutral-500">
             No organizations listed yet.

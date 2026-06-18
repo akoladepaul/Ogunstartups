@@ -18,14 +18,14 @@ export default function StatsSection({ stats }: StatsSectionProps) {
   return (
     <section className="bg-brand-green-600 py-14">
       <div className="section-container">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {items.map((item) => (
             <div key={item.label} className="text-center">
-              <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2">
                 {item.value}
                 {item.suffix}
               </div>
-              <div className="text-brand-green-100 text-sm font-medium">
+              <div className="text-brand-green-100 text-xs sm:text-sm font-medium">
                 {item.label}
               </div>
             </div>

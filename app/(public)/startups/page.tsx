@@ -39,16 +39,16 @@ export default async function StartupsPage({ searchParams }: PageProps) {
     <div className="pt-16 min-h-screen bg-neutral-50">
       {/* Header */}
       <div className="bg-white border-b border-neutral-100">
-        <div className="section-container py-10">
-          <h1 className="heading-2 text-neutral-900 mb-2">Startup Directory</h1>
-          <p className="text-neutral-500">
+        <div className="section-container py-6 sm:py-10">
+          <h1 className="heading-2 text-neutral-900 mb-1 sm:mb-2">Startup Directory</h1>
+          <p className="text-neutral-500 text-sm sm:text-base">
             {result.count} startup{result.count !== 1 ? "s" : ""} registered across Ogun State
           </p>
         </div>
       </div>
 
-      <div className="section-container py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="section-container py-5 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8">
           {/* Sidebar filters */}
           <aside className="lg:w-64 shrink-0">
             <Suspense>
