@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   Globe, Twitter, Linkedin, Instagram, MapPin, Calendar,
-  Users, BadgeCheck, ArrowLeft, Briefcase,
+  Users, BadgeCheck, ArrowLeft, Briefcase, ExternalLink,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -169,11 +169,19 @@ export default async function StartupProfilePage({ params }: PageProps) {
                       )}
                       <h3 className="font-medium text-neutral-900 mb-1 text-sm">{product.name}</h3>
                       <p className="text-xs text-neutral-500 line-clamp-2">{product.description}</p>
-                      {product.price && (
-                        <p className="text-sm font-semibold text-brand-green-600 mt-2">
-                          ₦{Number(product.price).toLocaleString()} {product.currency}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {product.price && (
+                          <p className="text-sm font-semibold text-brand-green-600">
+                            ₦{Number(product.price).toLocaleString()} {product.currency}
+                          </p>
+                        )}
+                        {(product as any).url && (
+                          <a href={(product as any).url} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-brand-green-600 hover:underline font-medium">
+                            <ExternalLink className="h-3 w-3" /> View Product
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

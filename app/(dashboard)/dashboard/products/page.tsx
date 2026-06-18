@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Package, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ interface Product {
   name: string;
   description: string | null;
   imageUrl: string | null;
+  url: string | null;
   price: unknown;
   currency: string;
   createdAt: Date;
@@ -22,12 +23,13 @@ interface Product {
 type FormState = {
   name: string;
   description: string;
+  url: string;
   price: string;
   currency: string;
   imageUrl: string;
 };
 
-const EMPTY_FORM: FormState = { name: "", description: "", price: "", currency: "NGN", imageUrl: "" };
+const EMPTY_FORM: FormState = { name: "", description: "", url: "", price: "", currency: "NGN", imageUrl: "" };
 
 export default function ProductsPage() {
   const [startupId, setStartupId] = useState<string | null>(null);
@@ -58,6 +60,7 @@ export default function ProductsPage() {
     setForm({
       name: p.name,
       description: p.description ?? "",
+      url: p.url ?? "",
       price: p.price != null ? String(p.price) : "",
       currency: p.currency,
       imageUrl: p.imageUrl ?? "",
@@ -151,6 +154,12 @@ export default function ProductsPage() {
               rows={3} placeholder="Brief description of the product or service" required className="mt-1.5" />
           </div>
 
+          <div>
+            <Label htmlFor="p-url">Product Link <span className="text-neutral-400 font-normal">(optional)</span></Label>
+            <Input id="p-url" type="url" value={form.url}
+              onChange={(e) => update("url", e.target.value)} placeholder="https://..." className="mt-1.5" />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="p-price">Price (optional)</Label>
@@ -206,11 +215,19 @@ export default function ProductsPage() {
             <div className="flex-1 min-w-0">
               <div className="font-medium text-neutral-900">{p.name}</div>
               <p className="text-sm text-neutral-500 line-clamp-2 mt-0.5">{p.description}</p>
-              {p.price != null && (
-                <p className="text-sm font-semibold text-brand-green-600 mt-1">
-                  ₦{Number(p.price).toLocaleString()} {p.currency}
-                </p>
-              )}
+              <div className="flex items-center gap-3 mt-1 flex-wrap">
+                {p.price != null && (
+                  <p className="text-sm font-semibold text-brand-green-600">
+                    ₦{Number(p.price).toLocaleString()} {p.currency}
+                  </p>
+                )}
+                {p.url && (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-brand-green-600 hover:underline">
+                    <ExternalLink className="h-3 w-3" /> View Product
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex gap-2 shrink-0">
               <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => openEdit(p)}>

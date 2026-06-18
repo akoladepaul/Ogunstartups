@@ -133,6 +133,7 @@ model StartupProduct {
   name        String
   description String?  @db.Text
   imageUrl    String?  @map("image_url")
+  url         String?  @map("product_url")
   price       Decimal? @db.Decimal(10, 2)
   currency    String   @default("NGN")
   createdAt   DateTime @default(now()) @map("created_at")

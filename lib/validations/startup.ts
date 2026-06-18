@@ -31,6 +31,7 @@ export type StartupFormData = z.infer<typeof startupSchema>;
 export const productSchema = z.object({
   name: z.string().min(2).max(100),
   description: z.string().min(10).max(500),
+  url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   price: z.coerce.number().min(0).optional().nullable(),
   currency: z.string().default("NGN"),
 });

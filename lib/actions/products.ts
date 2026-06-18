@@ -25,6 +25,7 @@ export async function createProduct(startupId: string, formData: FormData) {
       startupId,
       name: parsed.data.name,
       description: parsed.data.description ?? null,
+      url: parsed.data.url || null,
       price: parsed.data.price ?? null,
       currency: parsed.data.currency ?? "NGN",
       imageUrl: (raw.imageUrl as string) || null,
@@ -54,6 +55,7 @@ export async function updateProduct(productId: string, formData: FormData) {
     data: {
       name: parsed.data.name,
       description: parsed.data.description ?? null,
+      url: parsed.data.url || null,
       price: parsed.data.price ?? null,
       currency: parsed.data.currency ?? "NGN",
       imageUrl: (raw.imageUrl as string) || null,
