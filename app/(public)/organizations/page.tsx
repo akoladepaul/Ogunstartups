@@ -20,6 +20,7 @@ const ORG_TYPE_LABELS: Record<string, string> = {
   ngo: "NGO / Foundation",
   university_hub: "University Hub",
   corporate_program: "Corporate Program",
+  venture_support: "Venture Support",
 };
 
 const orgTypeColors: Record<string, string> = {
@@ -31,6 +32,7 @@ const orgTypeColors: Record<string, string> = {
   ngo: "bg-teal-100 text-teal-700",
   university_hub: "bg-indigo-100 text-indigo-700",
   corporate_program: "bg-pink-100 text-pink-700",
+  venture_support: "bg-cyan-100 text-cyan-700",
 };
 
 export default async function OrganizationsPage() {

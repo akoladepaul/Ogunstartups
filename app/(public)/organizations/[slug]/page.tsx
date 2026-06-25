@@ -19,6 +19,7 @@ const ORG_TYPE_LABELS: Record<string, string> = {
   ngo: "NGO",
   university_hub: "University Hub",
   corporate_program: "Corporate Program",
+  venture_support: "Venture Support",
 };
 
 interface PageProps {
