@@ -152,7 +152,7 @@ export async function createPost(data: {
   });
 
   revalidatePath("/blog");
-  redirect("/admin/blog");
+  return { success: true };
 }
 
 export async function updatePost(

@@ -40,12 +40,19 @@ export default function NewPostPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const result = await createPost({
-      ...form,
-      tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
-    });
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const result = await createPost({
+        ...form,
+        tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
+      });
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        router.push("/admin/blog");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
