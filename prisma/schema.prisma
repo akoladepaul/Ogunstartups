@@ -207,3 +207,12 @@ model Bookmark {
   @@unique([userId, startupId])
   @@map("bookmarks")
 }
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@map("password_reset_tokens")
+}
